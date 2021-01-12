@@ -17,8 +17,8 @@ from .server import app
 location = "app_folder"
 cwd = os.getcwd()
 
-df_total = pd.read_csv(os.path.join(cwd, location, "df_total.csv"), index_col=0)
-df = pd.read_csv(os.path.join(cwd, location, "df_by_well.csv"), index_col=0)
+df_total = pd.read_parquet(os.path.join(cwd, location, "df_total.parquet.gzip"))
+df = pd.read_parquet(os.path.join(cwd, location, "df_by_well.parquet.gzip"))
 
 # Get Confidential Well List Live! If not available, trigger to use last 15 just by date
 try:
@@ -378,12 +378,16 @@ layout = html.Div(
                                         ),
                                         html.Div(
                                             [
-                                                html.Label(["Select Component Desired",
-                                                dcc.Dropdown(
-                                                    id="component_dropdown",
-                                                    multi=True,
-                                                    value=["Select"],
-                                                )]),
+                                                html.Label(
+                                                    [
+                                                        "Select Component Desired",
+                                                        dcc.Dropdown(
+                                                            id="component_dropdown",
+                                                            multi=True,
+                                                            value=["Select"],
+                                                        ),
+                                                    ]
+                                                ),
                                             ],
                                             className="six columns",
                                         ),
@@ -392,33 +396,42 @@ layout = html.Div(
                                 ),
                                 html.Div(
                                     [
-                                        html.Label(["Select Operators Desired",
-                                        dcc.Dropdown(
-                                            id="operator_dropdown",
-                                            
-                                            options=[
-                                                {"label": i, "value": i}
-                                                for i in df["Licensee"]
-                                                .dropna()
-                                                .sort_values()
-                                                .unique()
-                                            ],
-                                            multi=True,
-                                            value=["Tourmaline Oil Corp."],
-                                        )]),
-                                        html.Label(["Select Formations Desired",
-                                        dcc.Dropdown(
-                                            id="formation_dropdown",
-                                            options=[
-                                                {"label": i, "value": i}
-                                                for i in df["Terminating Formation"]
-                                                .dropna()
-                                                .sort_values()
-                                                .unique()
-                                            ],
-                                            multi=True,
-                                            value=["SPIRIT RIVER FM"],
-                                        )]),
+                                        html.Label(
+                                            [
+                                                "Select Operators Desired",
+                                                dcc.Dropdown(
+                                                    id="operator_dropdown",
+                                                    options=[
+                                                        {"label": i, "value": i}
+                                                        for i in df["Licensee"]
+                                                        .dropna()
+                                                        .sort_values()
+                                                        .unique()
+                                                    ],
+                                                    multi=True,
+                                                    value=["Tourmaline Oil Corp."],
+                                                ),
+                                            ]
+                                        ),
+                                        html.Label(
+                                            [
+                                                "Select Formations Desired",
+                                                dcc.Dropdown(
+                                                    id="formation_dropdown",
+                                                    options=[
+                                                        {"label": i, "value": i}
+                                                        for i in df[
+                                                            "Terminating Formation"
+                                                        ]
+                                                        .dropna()
+                                                        .sort_values()
+                                                        .unique()
+                                                    ],
+                                                    multi=True,
+                                                    value=["SPIRIT RIVER FM"],
+                                                ),
+                                            ]
+                                        ),
                                         html.Div(
                                             id="upload_data_div",
                                             children=[
@@ -697,7 +710,7 @@ def update_component_options(
         formation_list,
     )
     if filtered_df.size == 0:
-        return [{"label":"","value":""}]
+        return [{"label": "", "value": ""}]
     else:
         options = [
             {"label": i, "value": i}

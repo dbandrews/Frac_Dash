@@ -15,8 +15,8 @@ from .server import app
 location = "app_folder"
 cwd = os.getcwd()
 
-df_total = pd.read_csv(os.path.join(cwd, location, "df_total.csv"), index_col=0)
-df = pd.read_csv(os.path.join(cwd, location, "df_by_well.csv"), index_col=0)
+df_total = pd.read_parquet(os.path.join(cwd, location, "df_total.parquet.gzip"))
+df = pd.read_parquet(os.path.join(cwd, location, "df_by_well.parquet.gzip"))
 
 
 # Get Confidential Well List Live! If not available, trigger to use last 15 just by date
